@@ -1,0 +1,33 @@
+{
+    "email" : "test1@gmail.com",
+    "password" : "12345678"
+}
+
+
+{
+Raj 
+test2@gmail.com
+123456789
+}
+
+Raj Ghetiya{
+Raj123@gmail.com
+Raj12345
+}
+
+Pujan Desai{
+Pujan123@gmail.com
+Pujan1234
+}
+
+Deep Dhanani{
+Deep123@gmail.com
+Deep12345
+}
+
+Tej Goti{
+Tej123@gmail.com
+Tej12345
+}
+
+
