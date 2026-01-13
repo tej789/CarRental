@@ -15,6 +15,8 @@ const generateToken = (userId) => {
 // Send OTP for registration
 export const sendRegistrationOTP = async (req, res) => {
     try {
+        console.log("🔥 sendRegistrationOTP HIT");
+        console.log("REQ BODY:", req.body);
         const { name, email, password } = req.body;
         
         if(!name || !email || !password || password.length < 8) {
@@ -52,7 +54,8 @@ export const sendRegistrationOTP = async (req, res) => {
                 isVerified: false
             });
         }
-        
+        console.log("📧 Sending OTP to:", email);
+
         // Send OTP via email
         const emailResult = await sendOtpEmail(email, otp);
         
