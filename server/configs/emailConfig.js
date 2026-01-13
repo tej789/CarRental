@@ -1,34 +1,35 @@
-import { Resend } from "resend";
+import nodemailer from "nodemailer";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Generate OTP
+export const generateOTP = () => {
+  return Math.floor(100000 + Math.random() * 900000).toString();
+};
 
-// Function to send OTP email
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+  },
+});
+
+// Send OTP email
 export const sendOtpEmail = async (email, otp, isPasswordReset = false) => {
   try {
     const subject = isPasswordReset
       ? "Password Reset OTP"
       : "Email Verification OTP";
 
-    await resend.emails.send({
-      from: "CarRental <onboarding@resend.dev>",
+    await transporter.sendMail({
+      from: `"CarRental" <${process.env.EMAIL_USER}>`,
       to: email,
       subject,
-      html: `
-        <h2>Your OTP is ${otp}</h2>
-        <p>This OTP will expire in 5 minutes.</p>
-      `,
+      text: `Your OTP is ${otp}. It will expire in 5 minutes.`,
     });
 
     return { success: true };
   } catch (error) {
-    console.error("Error sending email:", error);
-    return { success: false, error: error.message };
+    console.error("Email error:", error);
+    return { success: false };
   }
 };
-
-// Function to generate a random 6-digit OTP
-export const generateOTP = () => {
-  return Math.floor(100000 + Math.random() * 900000).toString();
-};
-
-export default { sendOtpEmail, generateOTP };
