@@ -1,17 +1,15 @@
-import nodemailer from "nodemailer";
+import Brevo from "@getbrevo/brevo";
 
 // Generate OTP
 export const generateOTP = () => {
   return Math.floor(100000 + Math.random() * 900000).toString();
 };
 
-const transporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS, // App Password
-  },
-});
+const apiInstance = new Brevo.TransactionalEmailsApi();
+apiInstance.setApiKey(
+  Brevo.TransactionalEmailsApiApiKeys.apiKey,
+  process.env.BREVO_API_KEY
+);
 
 // Send OTP email
 export const sendOtpEmail = async (email, otp, isPasswordReset = false) => {
@@ -20,16 +18,23 @@ export const sendOtpEmail = async (email, otp, isPasswordReset = false) => {
       ? "Password Reset OTP"
       : "Email Verification OTP";
 
-    await transporter.sendMail({
-      from: `"CarRental" <${process.env.EMAIL_USER}>`,
-      to: email,
+    const sendSmtpEmail = {
+      sender: {
+        email: process.env.BREVO_SENDER_EMAIL,
+        name: process.env.BREVO_SENDER_NAME,
+      },
+      to: [{ email }],
       subject,
-      text: `Your OTP is ${otp}. It will expire in 5 minutes.`,
-    });
+      htmlContent: `
+        <h2>Your OTP is ${otp}</h2>
+        <p>This OTP will expire in 5 minutes.</p>
+      `,
+    };
 
+    await apiInstance.sendTransacEmail(sendSmtpEmail);
     return { success: true };
   } catch (error) {
-    console.error("Email error:", error);
+    console.error("Brevo email error:", error);
     return { success: false };
   }
 };
