@@ -12,6 +12,9 @@ const Login = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
+
+    const [userId, setUserId] = useState(null); // ✅ NEW
+
     const [showOtpVerification, setShowOtpVerification] = useState(false);
     const [showForgotPassword, setShowForgotPassword] = useState(false);
     const [showResetPassword, setShowResetPassword] = useState(false);
@@ -62,6 +65,7 @@ const Login = () => {
             const { data } = await axios.post('/api/user/send-otp', { name, email, password });
             if (data.success) {
                 toast.success(data.message);
+                setUserId(data.userId); // ✅ STORE USER ID
                 setShowOtpVerification(true);
             } else {
                 toast.error(data.message);
@@ -124,6 +128,7 @@ const Login = () => {
         if (showOtpVerification) {
             return (
                 <OtpVerification
+                    userId={userId} // ✅ PASS USER ID
                     email={email}
                     isPasswordReset={showForgotPassword}
                     onSuccess={handleOtpSuccess}
@@ -159,10 +164,6 @@ const Login = () => {
                         <span className="text-primary">Forgot</span> Password
                     </h2>
 
-                    <p className="text-sm text-gray-500 text-center">
-                        Enter your email to receive reset OTP
-                    </p>
-
                     <div>
                         <label className="text-sm font-medium">Email</label>
                         <input
@@ -177,16 +178,6 @@ const Login = () => {
                     <button type="submit" disabled={loading} className={buttonClass}>
                         {loading ? "Sending..." : "Send Reset OTP"}
                     </button>
-
-                    <p
-                        onClick={() => {
-                            setShowForgotPassword(false);
-                            setState("login");
-                        }}
-                        className="text-center text-primary cursor-pointer hover:underline text-sm"
-                    >
-                        Back to Login
-                    </p>
                 </form>
             );
         }
@@ -198,42 +189,8 @@ const Login = () => {
                         <span className="text-primary">User</span> Login
                     </h2>
 
-                    <div>
-                        <label className="text-sm font-medium">Email</label>
-                        <input
-                            type="email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            className={inputClass}
-                            required
-                        />
-                    </div>
-
-                    <div>
-                        <label className="text-sm font-medium">Password</label>
-                        <input
-                            type="password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            className={inputClass}
-                            required
-                        />
-                    </div>
-
-                    <div className="flex justify-between text-sm">
-                        <span
-                            onClick={() => setState("register")}
-                            className="text-primary cursor-pointer hover:underline"
-                        >
-                            Create account
-                        </span>
-                        <span
-                            onClick={() => setShowForgotPassword(true)}
-                            className="text-primary cursor-pointer hover:underline"
-                        >
-                            Forgot password?
-                        </span>
-                    </div>
+                    <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className={inputClass} required />
+                    <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className={inputClass} required />
 
                     <button type="submit" disabled={loading} className={buttonClass}>
                         {loading ? "Logging in..." : "Login"}
@@ -248,59 +205,10 @@ const Login = () => {
                     <span className="text-primary">User</span> Sign Up
                 </h2>
 
-                <div>
-                    <label className="text-sm font-medium">Name</label>
-                    <input
-                        type="text"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        className={inputClass}
-                        required
-                    />
-                </div>
-
-                <div>
-                    <label className="text-sm font-medium">Email</label>
-                    <input
-                        type="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        className={inputClass}
-                        required
-                    />
-                </div>
-
-                <div>
-                    <label className="text-sm font-medium">Password</label>
-                    <input
-                        type="password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        className={inputClass}
-                        required
-                    />
-                </div>
-
-                <div>
-                    <label className="text-sm font-medium">Confirm Password</label>
-                    <input
-                        type="password"
-                        value={confirmPassword}
-                        onChange={(e) => setConfirmPassword(e.target.value)}
-                        className={inputClass}
-                        required
-                    />
-                </div>
-
-                <p className="text-sm text-center">
-                    Already have an account?
-                    <span
-                        onClick={() => setState("login")}
-                        className="text-primary cursor-pointer ml-1 hover:underline"
-                    >
-                        Login
-                    </span>
-                </p>
+                <input type="text" value={name} onChange={(e) => setName(e.target.value)} className={inputClass} required />
+                <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className={inputClass} required />
+                <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className={inputClass} required />
+                <input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} className={inputClass} required />
 
                 <button type="submit" disabled={loading} className={buttonClass}>
                     {loading ? "Creating Account..." : "Create Account"}
@@ -310,14 +218,8 @@ const Login = () => {
     };
 
     return (
-        <div
-            onClick={() => setShowLogin(false)}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
-        >
-            <div
-                onClick={(e) => e.stopPropagation()}
-                className="w-[90%] max-w-md bg-white rounded-xl shadow-2xl border border-gray-200 px-6 py-8 sm:px-8"
-            >
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
+            <div className="w-[90%] max-w-md bg-white rounded-xl p-6">
                 {renderForm()}
             </div>
         </div>

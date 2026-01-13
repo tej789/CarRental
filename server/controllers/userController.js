@@ -58,7 +58,16 @@ export const sendRegistrationOTP = async (req, res) => {
             return res.json({ success: false, message: "Failed to send OTP." });
         }
 
-        res.json({ success: true, message: "OTP sent to your email.", email });
+       const user = userExists 
+  ? userExists 
+  : await User.findOne({ email });
+
+res.json({
+    success: true,
+    message: "OTP sent to your email.",
+    userId: user._id
+});
+
 
     } catch (error) {
         console.log(error.message);
@@ -69,36 +78,50 @@ export const sendRegistrationOTP = async (req, res) => {
 // ================= VERIFY OTP =================
 export const verifyRegistrationOTP = async (req, res) => {
     try {
-        let { email, otp } = req.body;
+        const { userId, otp } = req.body;
 
-        if (!email || !otp) {
-            return res.json({ success: false, message: "Email and OTP are required." });
+        if (!userId || !otp) {
+            return res.json({
+                success: false,
+                message: "User ID and OTP are required."
+            });
         }
 
-        email = normalizeEmail(email); // 🔧 FIX
+        console.log("✅ VERIFY OTP HIT:", userId, otp);
 
-        console.log("✅ VERIFY OTP HIT:", email, otp);
-
-        const user = await User.findOne({ email });
+        const user = await User.findById(userId);
 
         if (!user) {
-            return res.json({ success: false, message: "User not found." });
+            return res.json({
+                success: false,
+                message: "User not found."
+            });
         }
 
         console.log("BEFORE UPDATE:", user.isVerified);
 
         if (user.isVerified) {
-            return res.json({ success: false, message: "User already verified." });
+            return res.json({
+                success: false,
+                message: "User already verified."
+            });
         }
 
         if (user.otp !== otp) {
-            return res.json({ success: false, message: "Invalid OTP." });
+            return res.json({
+                success: false,
+                message: "Invalid OTP."
+            });
         }
 
         if (user.otpExpiry < new Date()) {
-            return res.json({ success: false, message: "OTP expired." });
+            return res.json({
+                success: false,
+                message: "OTP expired."
+            });
         }
 
+        // ✅ GUARANTEED UPDATE
         user.isVerified = true;
         user.otp = null;
         user.otpExpiry = null;
@@ -108,11 +131,18 @@ export const verifyRegistrationOTP = async (req, res) => {
 
         const token = generateToken(user._id.toString());
 
-        res.json({ success: true, message: "Registration successful.", token });
+        return res.json({
+            success: true,
+            message: "Registration successful.",
+            token
+        });
 
     } catch (error) {
-        console.log(error.message);
-        res.json({ success: false, message: error.message });
+        console.log("VERIFY OTP ERROR:", error.message);
+        return res.json({
+            success: false,
+            message: error.message
+        });
     }
 };
 
