@@ -2,11 +2,14 @@ import nodemailer from 'nodemailer';
 
 // Create a transporter for sending emails
 const transporter = nodemailer.createTransport({
-    service: 'gmail',
+    host: "smtp.gmail.com",
+    port: 587,
+    secure: false,
     auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS
-    }
+    },
+    connectionTimeout: 10 * 1000
 });
 
 // Function to send OTP email
@@ -18,7 +21,7 @@ export const sendOtpEmail = async (email, otp, isPasswordReset = false) => {
             : `Your OTP for email verification is: ${otp}. This OTP will expire in 5 minutes.`;
         
         const mailOptions = {
-            from: process.env.EMAIL_USER || 'your-email@gmail.com',
+            from: process.env.EMAIL_USER,
             to: email,
             subject,
             text
