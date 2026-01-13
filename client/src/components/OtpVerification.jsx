@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAppContext } from '../context/AppContext';
 import toast from 'react-hot-toast';
 
@@ -10,19 +10,7 @@ const OtpVerification = ({ email, isPasswordReset = false, onSuccess, onBack }) 
     const [resendDisabled, setResendDisabled] = useState(true);
     const [countdown, setCountdown] = useState(60);
 
-    // ✅ FIX: create refs only once
-    const inputRefs = useRef([]);
-
-    if (inputRefs.current.length === 0) {
-        inputRefs.current = Array(6)
-            .fill(null)
-            .map(() => React.createRef());
-    }
-
-    // ✅ FIX: safe focus + timer
     useEffect(() => {
-        inputRefs.current[0]?.current?.focus();
-
         let timer;
         if (resendDisabled) {
             timer = setInterval(() => {
@@ -36,7 +24,6 @@ const OtpVerification = ({ email, isPasswordReset = false, onSuccess, onBack }) 
                 });
             }, 1000);
         }
-
         return () => clearInterval(timer);
     }, [resendDisabled]);
 
@@ -46,16 +33,6 @@ const OtpVerification = ({ email, isPasswordReset = false, onSuccess, onBack }) 
         const newOtp = [...otp];
         newOtp[index] = value;
         setOtp(newOtp);
-
-        if (value && index < 5) {
-            inputRefs.current[index + 1]?.current?.focus();
-        }
-    };
-
-    const handleKeyDown = (index, e) => {
-        if (e.key === 'Backspace' && !otp[index] && index > 0) {
-            inputRefs.current[index - 1]?.current?.focus();
-        }
     };
 
     const handlePaste = (e) => {
@@ -63,9 +40,7 @@ const OtpVerification = ({ email, isPasswordReset = false, onSuccess, onBack }) 
         const pastedData = e.clipboardData.getData('text').trim();
 
         if (/^\d{6}$/.test(pastedData)) {
-            const newOtp = pastedData.split('');
-            setOtp(newOtp);
-            inputRefs.current[5]?.current?.focus();
+            setOtp(pastedData.split(''));
         }
     };
 
@@ -116,7 +91,6 @@ const OtpVerification = ({ email, isPasswordReset = false, onSuccess, onBack }) 
                 setResendDisabled(true);
                 setCountdown(60);
                 setOtp(['', '', '', '', '', '']);
-                inputRefs.current[0]?.current?.focus();
             } else {
                 toast.error(data.message || 'Failed to resend OTP');
             }
@@ -141,14 +115,12 @@ const OtpVerification = ({ email, isPasswordReset = false, onSuccess, onBack }) 
                 {otp.map((digit, index) => (
                     <input
                         key={index}
-                        ref={inputRefs.current[index]}
                         type="text"
                         maxLength={1}
                         value={digit}
                         onChange={(e) => handleChange(index, e.target.value)}
-                        onKeyDown={(e) => handleKeyDown(index, e)}
                         onPaste={index === 0 ? handlePaste : undefined}
-                        className="w-10 h-10 sm:w-12 sm:h-12 text-center text-lg sm:text-xl border border-gray-300 rounded-md focus:outline-primary focus:border-primary"
+                        className="w-10 h-10 sm:w-12 sm:h-12 text-center text-lg border border-gray-300 rounded-md"
                     />
                 ))}
             </div>
@@ -156,7 +128,7 @@ const OtpVerification = ({ email, isPasswordReset = false, onSuccess, onBack }) 
             <button
                 onClick={handleVerify}
                 disabled={loading || otp.join('').length !== 6}
-                className="bg-primary hover:bg-blue-800 transition-all text-white w-full py-3 rounded-md disabled:bg-gray-400"
+                className="bg-primary text-white w-full py-3 rounded-md disabled:bg-gray-400"
             >
                 {loading ? 'Verifying...' : 'Verify OTP'}
             </button>
