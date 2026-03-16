@@ -164,6 +164,10 @@ const Login = () => {
                         <span className="text-primary">Forgot</span> Password
                     </h2>
 
+                    <p className="text-center text-gray-600 text-sm">
+                        Enter your email to receive reset OTP
+                    </p>
+
                     <div>
                         <label className="text-sm font-medium">Email</label>
                         <input
@@ -178,26 +182,74 @@ const Login = () => {
                     <button type="submit" disabled={loading} className={buttonClass}>
                         {loading ? "Sending..." : "Send Reset OTP"}
                     </button>
-                </form>
-            );
-        }
 
-        if (state === "login") {
-            return (
-                <form onSubmit={handleLogin} className="flex flex-col gap-5">
-                    <h2 className="text-2xl font-semibold text-center">
-                        <span className="text-primary">User</span> Login
-                    </h2>
-
-                    <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className={inputClass} required />
-                    <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className={inputClass} required />
-
-                    <button type="submit" disabled={loading} className={buttonClass}>
-                        {loading ? "Logging in..." : "Login"}
+                    <button
+                        type="button"
+                        onClick={() => {
+                            setShowForgotPassword(false);
+                            setState("login");
+                        }}
+                        className="text-primary hover:underline text-center text-sm"
+                    >
+                        Back to Login
                     </button>
                 </form>
             );
         }
+
+   if (state === "login") {
+    return (
+        <form onSubmit={handleLogin} className="flex flex-col gap-5">
+            <h2 className="text-2xl font-semibold text-center">
+                <span className="text-primary">User</span> Login
+            </h2>
+
+            <div>
+                <label className="text-sm font-medium">Email</label>
+                <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className={inputClass}
+                    required
+                />
+            </div>
+
+            <div>
+                <label className="text-sm font-medium">Password</label>
+                <input
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className={inputClass}
+                    required
+                />
+            </div>
+
+            <div className="flex justify-between text-sm">
+                <span
+                    onClick={() => setState("signup")}
+                    className="text-primary cursor-pointer"
+                >
+                    Create account
+                </span>
+
+                <span
+                    onClick={() => {
+                        setShowForgotPassword(true);
+                    }}
+                    className="text-primary cursor-pointer"
+                >
+                    Forgot password?
+                </span>
+            </div>
+
+            <button type="submit" disabled={loading} className={buttonClass}>
+                {loading ? "Logging in..." : "Login"}
+            </button>
+        </form>
+    );
+}
 
         return (
             <form onSubmit={handleSignup} className="flex flex-col gap-5">
@@ -205,10 +257,59 @@ const Login = () => {
                     <span className="text-primary">User</span> Sign Up
                 </h2>
 
-                <input type="text" value={name} onChange={(e) => setName(e.target.value)} className={inputClass} required />
-                <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className={inputClass} required />
-                <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className={inputClass} required />
-                <input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} className={inputClass} required />
+                <div>
+                    <label className="text-sm font-medium">Name</label>
+                    <input
+                        type="text"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        className={inputClass}
+                        required
+                    />
+                </div>
+
+                <div>
+                    <label className="text-sm font-medium">Email</label>
+                    <input
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        className={inputClass}
+                        required
+                    />
+                </div>
+
+                <div>
+                    <label className="text-sm font-medium">Password</label>
+                    <input
+                        type="password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        className={inputClass}
+                        required
+                    />
+                </div>
+
+                <div>
+                    <label className="text-sm font-medium">Confirm Password</label>
+                    <input
+                        type="password"
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        className={inputClass}
+                        required
+                    />
+                </div>
+
+                <p className="text-center text-sm">
+                    Already have an account?{" "}
+                    <span
+                        className="text-primary cursor-pointer hover:underline"
+                        onClick={() => setState("login")}
+                    >
+                        Login
+                    </span>
+                </p>
 
                 <button type="submit" disabled={loading} className={buttonClass}>
                     {loading ? "Creating Account..." : "Create Account"}

@@ -1,21 +1,19 @@
 import express from 'express';
 import { 
-    getCars, 
-    getUserData, 
-    loginUser, 
-    registerUser, 
-    sendRegistrationOTP, 
-    verifyRegistrationOTP, 
-    resendOTP, 
-    forgotPassword, 
-    resetPassword 
+    getCars,
+    loginUser,
+    sendRegistrationOTP,
+    verifyRegistrationOTP,
+    resendOTP,
+    forgotPassword,
+    resetPassword,
+    getUserData
 } from '../controllers/userController.js';
 import { protect } from '../middleware/auth.js';
 
 const userRouter = express.Router();
 
 // Authentication routes
-userRouter.post('/register', registerUser); // Legacy route
 userRouter.post('/login', loginUser);
 userRouter.get('/data', protect, getUserData);
 

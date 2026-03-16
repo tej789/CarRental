@@ -6,7 +6,7 @@ import toast from 'react-hot-toast';
 
 const AddCar = () => {
 
-  const {axios, currency} = useAppContext();
+  const {axios, currency, fetchCars} = useAppContext();
   
   const [image, setImage] = useState(null);
   const [car, setCar] = useState({
@@ -55,6 +55,10 @@ const AddCar = () => {
             location: '',
             description: '',
         });
+
+        // Refresh available cars list across the app so the new car
+        // appears immediately in the public "Available Cars" section.
+        fetchCars && fetchCars();
       }else{
         toast.error(data.message);
       }

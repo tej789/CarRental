@@ -20,8 +20,9 @@ export const sendOtpEmail = async (email, otp, isPasswordReset = false) => {
 
     const sendSmtpEmail = {
       sender: {
-        email: process.env.BREVO_SENDER_EMAIL,
-        name: process.env.BREVO_SENDER_NAME,
+        // Fall back to generic values if dedicated Brevo sender env vars are not set
+        email: process.env.BREVO_SENDER_EMAIL || process.env.EMAIL_USER,
+        name: process.env.BREVO_SENDER_NAME || "CarRental",
       },
       to: [{ email }],
       subject,
