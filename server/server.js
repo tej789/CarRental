@@ -5,6 +5,7 @@ import connectDB from './configs/db.js';
 import userRouter from './routes/userRoutes.js';
 import ownerRouter from './routes/ownerRoutes.js'; 
 import bookingRouter from './routes/bookingRoutes.js'; 
+import reviewRouter from './routes/reviewRoutes.js'; 
 
 // Initialize Express App
 const app = express();
@@ -22,6 +23,7 @@ app.get('/', (req, res) => {
 app.use('/api/user', userRouter);
 app.use('/api/owner', ownerRouter);
 app.use('/api/bookings', bookingRouter); 
+app.use('/api/reviews', reviewRouter); 
 
 const PORT = process.env.PORT || 3000;
 

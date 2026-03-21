@@ -1,61 +1,89 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import Title from './Title'
 import { assets } from '../assets/assets';
 import {motion} from 'motion/react'
+import { useAppContext } from '../context/AppContext';
+import { useNavigate } from 'react-router-dom';
 
 const Testimonial = () => {
-    
-    const testimonials = [
-        {
-            name: "Emma Rodriguez", 
-            location: "Barcelona, Spain", 
-            image: assets.testimonial_image_1,
-            testimonial: "I've rented cars from various companies, but the experience with carRental was exceptional." 
-        },
-         {
-            name: "John Smith", 
-            location: "New York, USA", 
-            image: assets.testimonial_image_2,
-            testimonial: "CarRental made my trip so much easier. The car was delivered right to my door, and customer service was fantastic!" 
-        },
-        {
-            name: "Ava Johnson", 
-            location: "Sydney, Australia", 
-            image: assets.testimonial_image_1,
-            testimonial: "I highly recommend CarRental! Their fleet is amazing, and I always feel like I'm getting the best deal with excellent service." 
-        }
-        
-    ];
 
+    const { axios } = useAppContext();
+    const navigate = useNavigate();
+    const [reviews, setReviews] = useState([]);
+    const [loading, setLoading] = useState(false);
+
+    const fetchReviews = async () => {
+        try{
+            setLoading(true);
+            const {data} = await axios.get('/api/reviews');
+            if(data.success){
+                setReviews(data.reviews);
+            }
+        }
+        catch(error){
+            console.log(error.message);
+        }
+        finally{
+            setLoading(false);
+        }
+    }
+
+    useEffect(() => {
+        fetchReviews();
+    },[]);
 
   return (
       <div className="py-28 px-6 md:px-16 ld:px-24 xl:px-44">
             
-        <Title title="What our Customers Say" subTitle="Discover why discerning travelers choose stayVenture for their luxury accommodations aroud the world."/>
+        <Title title="What our Customers Say" subTitle="Real feedback from customers who booked with us."/>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mt-18">
-                {testimonials.map((testimonial, index) => (
+                {loading && reviews.length === 0 && (
+                    <p className="col-span-full text-center text-gray-500">Loading feedback...</p>
+                )}
+                {!loading && reviews.length === 0 && (
+                    <p className="col-span-full text-center text-gray-500">No feedback yet. Be the first to share your experience!</p>
+                )}
+                {reviews.slice(0,3).map((review, index) => (
                     <motion.div 
                     initial={{opacity:0, y:40}}
                     whileInView={{opacity:1, y:0}}
-                    transition={{duration:0.6, delay:index*0.2,ease:"easeOut"}}
+                    transition={{duration:0.6, delay:index*0.1,ease:"easeOut"}}
                     viewport={{once:true, amount:0.3}}
-                    key={index} className="bg-white p-6 rounded-xl shadow-lg hover:-translate-y-1 transition-all duration-500">
+                    key={review._id || index} className="bg-white p-6 rounded-xl shadow-lg hover:-translate-y-1 transition-all duration-500">
                         <div className="flex items-center gap-3">
-                            <img className="w-12 h-12 rounded-full" src={testimonial.image} alt={testimonial.name} />
+                            {review.image ? (
+                                <img 
+                                    src={review.image} 
+                                    alt={review.name}
+                                    className="w-12 h-12 rounded-full object-cover"
+                                />
+                            ) : (
+                                <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold text-lg uppercase">
+                                    {review.name ? review.name.charAt(0) : 'U'}
+                                </div>
+                            )}
                             <div>
-                                <p className="text-xl">{testimonial.name}</p>
-                                <p className="text-gray-500">{testimonial.location}</p>
+                                <p className="text-xl">{review.name}</p>
+                                {review.location && <p className="text-gray-500">{review.location}</p>}
                             </div>
                         </div>
                         <div className="flex items-center gap-1 mt-4">
-                            {Array(5).fill(0).map((_, index) => (
+                            {Array(review.rating || 5).fill(0).map((_, index) => (
                                 <img key={index} src={assets.star_icon} alt="star-icon" />
                             ))}
                         </div>
-                        <p className="text-gray-500 max-w-90 mt-4 font-light">"{testimonial.testimonial}"</p>
+                        <p className="text-gray-500 max-w-90 mt-4 font-light">"{review.comment}"</p>
                     </motion.div>
                 ))}
+            </div>
+            <div className="mt-10 flex justify-center">
+                <button 
+                    onClick={() => navigate('/feedback')}
+                    className="px-6 py-2 bg-primary text-white text-sm font-medium rounded-lg hover:bg-primary-dull transition-colors"
+                >
+                    View all feedback
+                </button>
             </div>
         </div>
   )

@@ -5,6 +5,7 @@ import Home from './pages/Home';
 import Cars from './pages/Cars';
 import CarDetails from './pages/CarDetails';
 import MyBookings from './pages/MyBookings';
+import Feedback from './pages/Feedback';
 import Footer from './components/Footer';
 import Layout from './pages/owner/Layout';
 import Dashboard from './pages/owner/Dashboard';
@@ -33,6 +34,7 @@ const App = () => {
         <Route path="/cars" element={<Cars />} />
         <Route path='/car-details/:id' element={<CarDetails/>}/>
         <Route path='/my-bookings' element={<MyBookings/>}/>
+        <Route path='/feedback' element={<Feedback/>}/>
         <Route path='/owner' element={<Layout />}>
             <Route index element={<Dashboard />}/>
             <Route path='add-car' element={<AddCar />}/>
