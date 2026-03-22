@@ -7,6 +7,7 @@ import {motion} from 'motion/react';
 
 const Navbar = () => {
 
+  
   const {setShowLogin, user, logout, isOwner, axios, setIsOwner} = useAppContext();
 
   const location = useLocation();
